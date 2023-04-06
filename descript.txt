@@ -1,0 +1,15 @@
+//charset,UTF-8
+readme.charset,UTF-8
+readme.readme.md
+type,plugin
+name,CeVIO-TalkerV2
+craftman,ambergon
+filename,main.dll
+
+id,543fada0-cee7-11ed-b16f-0800200c9a66
+
+secondchangeinterval,0
+otherghosttalk,before
+
+//更新url
+//homeurl,
