@@ -1,5 +1,5 @@
 # SSP-CeVIO-TalkerV2
-[GitHub - ambergon/ukagakaPlugin_CeVIO-Talker: 伺かSSPからCeVIO AIにトークを流し込んで読み上げてもらうプラグイン。調声が可能。読み上げるゴーストおよび声の設定が可能。](https://github.com/ambergon/ukagakaPlugin_CeVIO-Talker)
+[GitHub - ambergon/ukagakaPlugin_CeVIO-Talker: 伺かSSPからCeVIO AIにトークを流し込んで読み上げてもらうプラグイン。調声が可能。読み上げるゴーストおよび声の設定が可能。](https://github.com/ambergon/ukagakaPlugin_CeVIO-Talker)<br>
 以前作成した伺か/SSPのプラグインをリメイクしました。<br>
 
 
