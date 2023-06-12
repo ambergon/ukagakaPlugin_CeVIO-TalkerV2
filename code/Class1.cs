@@ -208,19 +208,19 @@ namespace CShar {
                 Match m;
                 m = Regex.Match( line  , "^\\\\0" );
                 if( m.Success ){
-                    if ( Voice1 == "" ){ break; } 
+                    if ( Voice1 == "" ){ continue; } 
                     TalkSetting( Voice1 );
                 }
 
                 m = Regex.Match( line  , "^\\\\1" );
                 if( m.Success ){
-                    if ( Voice2 == "" ){ break; } 
+                    if ( Voice2 == "" ){ continue; } 
                     TalkSetting( Voice2 );
                 }
 
                 m = Regex.Match( line  , "^\\\\p" );
                 if( m.Success ){
-                    if ( Voice3 == "" ){ break; } 
+                    if ( Voice3 == "" ){ continue; } 
                     TalkSetting( Voice3 );
                 }
                 //文字列マッチなしだと前回使用したものが使用される。
@@ -231,6 +231,11 @@ namespace CShar {
                 //Console.WriteLine( "line    " + talkText );
                 //Console.WriteLine( "Ghost   " + GhostName );
                 //Console.WriteLine( "section " + OldSection );
+                
+                //\0\1等がなにも指定されていない状態で発生するテキストをカットする。
+                if( talker.Cast == null ){
+                    continue;
+                }
                 
                 SpeakingState2 state = talker.Speak( talkText );
                 //SpeakingState2 state = talker.Speak( "大好き" ); 
@@ -296,6 +301,7 @@ namespace CShar {
             text         = text.Replace( "】" , "" );
             text         = text.Replace( "？" , "?" );
             text         = text.Replace( "！" , "!" );
+            text         = text.Replace( "～" , "ー" );
             text         = text.Replace( "　" , " " );
             text         = text.Replace( "\\h" , "\\0" );
             text         = text.Replace( "\\u" , "\\1" );
@@ -303,7 +309,10 @@ namespace CShar {
             text         = text.Replace( "\\1" , ",\\1" );
             //三人目確保
             text         = Regex.Replace( text  , "\\\\p\\[.*?\\]"   , ",\\p" );
+
+            //改行置換。
             text         = Regex.Replace( text  , "\\\\n\\[half\\]" , "。" );
+            text         = Regex.Replace( text  , "\\\\n\\[[0-9].*?\\]" , "。" );
             text         = Regex.Replace( text  , "\\\\n" , "。" );
 
             text         = Regex.Replace( text  , "\\\\__[a-zA-Z]\\[.*?\\]" , "" );
