@@ -200,11 +200,6 @@ namespace CShar {
                 //さっきのゴースト名を保存して
                 //char1,2,3をそれぞれstaticに。
                 //ゴースト名が同じとき取得をスルーして処理を減らす。
-                string talkText = Regex.Replace( line  , "\\\\[01p]" , "" );
-                if( talkText == "" ){
-                    continue;
-                }
-
                 Match m;
                 m = Regex.Match( line  , "^\\\\0" );
                 if( m.Success ){
@@ -231,6 +226,12 @@ namespace CShar {
                 //Console.WriteLine( "line    " + talkText );
                 //Console.WriteLine( "Ghost   " + GhostName );
                 //Console.WriteLine( "section " + OldSection );
+                
+                //キャラ指定だけで途切れているトーク対策にmatchの後に持ってくる。
+                string talkText = Regex.Replace( line  , "\\\\[01p]" , "" );
+                if( talkText == "" ){
+                    continue;
+                }
                 
                 //\0\1等がなにも指定されていない状態で発生するテキストをカットする。
                 if( talker.Cast == null ){
