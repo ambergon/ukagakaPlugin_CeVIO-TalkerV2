@@ -23,9 +23,12 @@ namespace CShar {
         static string GhostConfig;
 
         static string OldSection = "";
+        static string talkChar   = "";
         static string Voice1     = "";
         static string Voice2     = "";
         static string Voice3     = "";
+
+        static uint English      = 0;
 
         static int TaskLen       = 0;
         static int BreakFlag     = 0;
@@ -189,11 +192,17 @@ namespace CShar {
                 GetPrivateProfileString( ChangeSection , "Char3", "", sb, Convert.ToUInt32(sb.Capacity), GhostConfig ); 
                 Voice3 = sb.ToString();
 
+                //英語仕様の有効化。
+                English = GetPrivateProfileInt( ChangeSection , "English" , 0 , GhostConfig ); 
+
                 OldSection = ChangeSection;
             }
 
             string[] SakuraScriptSep = {"。"};
             string[] SakuraScripts = SakuraScript.Split( SakuraScriptSep , StringSplitOptions.None );
+
+            //これだけじゃ、毎回\0を使わないゴーストで問題が起きようぞ。
+            //static化するべき。
             foreach ( string line in SakuraScripts ) {
                 CheckLoop = 1;
 
@@ -204,19 +213,22 @@ namespace CShar {
                 m = Regex.Match( line  , "^\\\\0" );
                 if( m.Success ){
                     if ( Voice1 == "" ){ continue; } 
-                    TalkSetting( Voice1 );
+                    //TalkSetting( Voice1 );
+                    talkChar = Voice1;
                 }
 
                 m = Regex.Match( line  , "^\\\\1" );
                 if( m.Success ){
                     if ( Voice2 == "" ){ continue; } 
-                    TalkSetting( Voice2 );
+                    //TalkSetting( Voice2 );
+                    talkChar = Voice2;
                 }
 
                 m = Regex.Match( line  , "^\\\\p" );
                 if( m.Success ){
                     if ( Voice3 == "" ){ continue; } 
-                    TalkSetting( Voice3 );
+                    //TalkSetting( Voice3 );
+                    talkChar = Voice3;
                 }
                 //文字列マッチなしだと前回使用したものが使用される。
                 //他のゴーストと合わせてDefaultを使用する場合混同してしまう場合がある。
@@ -229,15 +241,29 @@ namespace CShar {
                 
                 //キャラ指定だけで途切れているトーク対策にmatchの後に持ってくる。
                 string talkText = Regex.Replace( line  , "\\\\[01p]" , "" );
+                talkText = Regex.Replace( talkText  , " " , "" );
                 if( talkText == "" ){
                     continue;
                 }
                 
+                //英文判定
+                //英文判定しても、戻す手段が必要だ。
+                //サクラスクリプトによる分割は\0\1等、最初だけなので、ここで指定してしまうと、戻せなくなる。
+                //talkCharに使っていたキャラを保存するようにした。
+                m = Regex.Match( talkText  , "^[a-zA-Z0-9 !?.,*/@#$%^&*:;'\"’-]*$" );
+                if( m.Success && English == 1 ){
+                    //Console.WriteLine( "英文モード" );
+                    TalkSetting( "弦巻マキ (英)" );
+                } else {
+                    //Console.WriteLine( "normal mode" );
+                    if( talkChar != "" ){ TalkSetting( talkChar ); }
+                }
+
+
                 //\0\1等がなにも指定されていない状態で発生するテキストをカットする。
                 if( talker.Cast == null ){
                     continue;
                 }
-                
                 SpeakingState2 state = talker.Speak( talkText );
                 //SpeakingState2 state = talker.Speak( "大好き" ); 
                 //終了しないからいらない。
@@ -308,6 +334,14 @@ namespace CShar {
             text         = text.Replace( "\\u" , "\\1" );
             text         = text.Replace( "\\0" , ",\\0" );
             text         = text.Replace( "\\1" , ",\\1" );
+            //三点リーダー。文字化け注意。
+            text         = text.Replace( "…" , "。" );
+            text         = text.Replace( "・" , "。" );
+
+
+            //\e以降をカット
+            text         = Regex.Replace( text  , "\\\\e.*$" , "" );
+
             //三人目確保
             text         = Regex.Replace( text  , "\\\\p\\[.*?\\]"   , ",\\p" );
 
@@ -328,7 +362,10 @@ namespace CShar {
 
             text         = Regex.Replace( text  , "\\\\[^01p]" , "" );
 
+            //英文のカット用に置換してみる。
+            text         = text.Replace( "." , "。" );
             text         = text.Replace( "," , "。" );
+
             text         = Regex.Replace( text  , "^。" , "" );
             text         = Regex.Replace( text  , "$" , "。" );
             text         = Regex.Replace( text  , "。+" , "。" );
